@@ -1,11 +1,7 @@
 use crate::util;
 
 pub fn part1(input: &str) -> Result<String> {
-    let lines = input
-        .lines()
-        .map(|s| s.trim())
-        .filter(|s| !s.is_empty())
-        .map(|s| s.to_string());
+    let lines = util::non_empty_lines(input);
 
     let process = util::compose!(find_value);
 
@@ -15,11 +11,7 @@ pub fn part1(input: &str) -> Result<String> {
 }
 
 pub fn part2(input: &str) -> Result<String> {
-    let lines = input
-        .lines()
-        .map(|s| s.trim())
-        .filter(|s| !s.is_empty())
-        .map(|s| s.to_string());
+    let lines = util::non_empty_lines(input);
 
     let process = util::compose!(replace_digits, find_value);
 
