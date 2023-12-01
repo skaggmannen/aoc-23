@@ -16,7 +16,7 @@ where
     move |a| g(f(a))
 }
 
-pub fn non_empty_lines<'a>(s: &'a str) -> impl Iterator<Item = String> + 'a {
+pub fn non_empty_lines(s: &str) -> impl Iterator<Item = String> + '_ {
     s.lines()
         .map(|s| s.trim())
         .filter(|s| !s.is_empty())
