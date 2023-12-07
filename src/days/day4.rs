@@ -1,9 +1,6 @@
 extern crate itertools;
 
-use std::{
-    collections::{HashMap, HashSet},
-    str::FromStr,
-};
+use std::collections::{HashMap, HashSet};
 
 use itertools::Itertools;
 

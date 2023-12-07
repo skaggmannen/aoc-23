@@ -20,7 +20,7 @@
                 }
             },
             "args": [
-                "day5",
+                "day6",
                 "part2"
             ],
             "cwd": "${workspaceFolder}"
