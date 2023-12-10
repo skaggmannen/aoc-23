@@ -4,7 +4,6 @@ extern crate num;
 use std::{collections::HashMap, str::FromStr};
 
 use itertools::Itertools;
-use num::integer::lcm;
 
 use crate::util;
 

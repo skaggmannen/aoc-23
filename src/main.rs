@@ -1,7 +1,5 @@
 extern crate clap;
 
-use std::collections::HashMap;
-
 use clap::Parser;
 
 mod days;
@@ -69,6 +67,11 @@ fn main() {
             "day9" => match args.part.as_str() {
                 "part1" => days::day9::part1(&input).unwrap(),
                 "part2" => days::day9::part2(&input).unwrap(),
+                _ => format!("Invalid part {}", args.part),
+            },
+            "day10" => match args.part.as_str() {
+                "part1" => days::day10::part1(&input).unwrap(),
+                "part2" => days::day10::part2(&input).unwrap(),
                 _ => format!("Invalid part {}", args.part),
             },
             _ => format!("Invalid day {}", args.day),
