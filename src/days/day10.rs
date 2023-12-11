@@ -29,7 +29,6 @@ pub fn part2(input: &str) -> Result<String> {
     let loop_tiles = map.iter().collect::<HashSet<_>>();
 
     let mut inside_area = 0;
-    let mut outside_area = 0;
 
     for row in 0..map.lines.len() {
         let mut inside = false;
@@ -74,8 +73,6 @@ pub fn part2(input: &str) -> Result<String> {
 
                 if inside {
                     inside_area += 1;
-                } else {
-                    outside_area += 1;
                 }
             }
         }
@@ -221,40 +218,6 @@ fn start_delta(c: &char) -> Pos {
         'L' | 'F' => Pos(0, -1),      // Pretend we entered from east
         '-' | 'J' | '7' => Pos(0, 1), // Pretend we entered from west
         _ => Pos(0, 0),
-    }
-}
-
-struct AreaFinder<'a> {
-    values: &'a HashMap<Pos, char>,
-    loop_tiles: &'a HashSet<Pos>,
-    visited: HashSet<Pos>,
-}
-
-impl AreaFinder<'_> {
-    fn find(&mut self, pos: Pos) -> Option<(usize, bool)> {
-        if self.visited.contains(&pos) {
-            None
-        } else if !self.values.contains_key(&pos) {
-            Some((0, true))
-        } else if self.loop_tiles.contains(&pos) {
-            Some((0, false))
-        } else {
-            self.visited.insert(pos);
-
-            let mut area = if self.values[&pos] == '.' { 1 } else { 0 };
-            let mut outside = false;
-
-            for dy in -1..=1 {
-                for dx in -1..=1 {
-                    if let Some((v, o)) = self.find(Pos(pos.0 + dy, pos.1 + dx)) {
-                        area += v;
-                        outside = outside || o;
-                    }
-                }
-            }
-
-            Some((area, outside))
-        }
     }
 }
 
