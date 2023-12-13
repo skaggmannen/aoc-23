@@ -14,15 +14,15 @@ pub fn part1(input: &str) -> Result<String> {
     let score = lines
         .iter()
         .map(|l| l.split_once(" ").unwrap())
-        .map(|(conditions, s)| {
+        .map(|(springs, s)| {
             (
-                conditions,
+                springs,
                 s.split(",")
                     .map(|s| s.parse::<usize>().unwrap())
                     .collect_vec(),
             )
         })
-        .map(|(conditions, groups)| count_alternatives(&conditions, &groups, &mut cache))
+        .map(|(springs, groups)| count_alternatives(&springs, &groups, &mut cache))
         .sum::<usize>();
 
     Ok(score.to_string())
@@ -40,21 +40,21 @@ pub fn part2(input: &str) -> Result<String> {
     let score = lines
         .iter()
         .map(|l| l.split_once(" ").unwrap())
-        .map(|(conditions, s)| {
+        .map(|(springs, s)| {
             return (
-                [conditions].repeat(5).join("?").to_string(),
+                [springs].repeat(5).join("?").to_string(),
                 [s].repeat(5).join(",").to_string(),
             );
         })
-        .map(|(conditions, s)| {
+        .map(|(springs, s)| {
             (
-                conditions,
+                springs,
                 s.split(",")
                     .map(|s| s.parse::<usize>().unwrap())
                     .collect_vec(),
             )
         })
-        .map(|(conditions, groups)| count_alternatives(&conditions, &groups, &mut cache))
+        .map(|(springs, groups)| count_alternatives(&springs, &groups, &mut cache))
         .sum::<usize>();
 
     Ok(score.to_string())
@@ -76,11 +76,11 @@ const TEST_INPUT: &str = "
 ";
 
 fn count_alternatives(
-    conditions: &str,
+    springs: &str,
     groups: &[usize],
     cache: &mut HashMap<(String, Vec<usize>), usize>,
 ) -> usize {
-    if conditions.is_empty() {
+    if springs.is_empty() {
         // We're out of springs so there should be no more groups left
         if groups.is_empty() {
             return 1;
@@ -90,15 +90,15 @@ fn count_alternatives(
     }
 
     if groups.is_empty() {
-        // There should be no more damaged springs left
-        if conditions.contains('#') {
+        // We're out of groups, so there should be no more _damaged_ springs left
+        if springs.contains('#') {
             return 0;
         } else {
             return 1;
         }
     }
 
-    let cache_key = (conditions.to_string(), groups.to_vec());
+    let cache_key = (springs.to_string(), groups.to_vec());
 
     // Check if there's already a result for this setup in the cache
     if let Some(&result) = cache.get(&cache_key) {
@@ -106,24 +106,27 @@ fn count_alternatives(
     }
 
     let mut result = 0;
-    if conditions.starts_with(".") || conditions.starts_with("?") {
+    if springs.starts_with(".") || springs.starts_with("?") {
         // Assume that the spring was undamaged and count the number of valid
         // alternatives.
-        result += count_alternatives(&conditions[1..], groups, cache)
+        result += count_alternatives(&springs[1..], groups, cache)
     }
 
-    if conditions.starts_with("#") || conditions.starts_with("?") {
+    if springs.starts_with("#") || springs.starts_with("?") {
         // Assume that the spring was damaged and count the number of valid
         // alternatives.
-        if groups[0] <= conditions.len() && !(&conditions[..groups[0]]).contains(".") {
-            if groups[0] == conditions.len() {
+
+        // Check that there are enough springs left and the upcoming subsection
+        // does not contain any undamaged springs.
+        if groups[0] <= springs.len() && !(&springs[..groups[0]]).contains(".") {
+            if groups[0] == springs.len() {
                 // The group consumes the remaining string, do a recursive call
                 // to check the end condition.
                 result += count_alternatives("", &groups[1..], cache);
-            } else if conditions.chars().nth(groups[0]).unwrap() != '#' {
+            } else if springs.chars().nth(groups[0]).unwrap() != '#' {
                 // The group successfully matches the start of the string.
                 // Consume and check the remainder.
-                result += count_alternatives(&conditions[groups[0] + 1..], &groups[1..], cache)
+                result += count_alternatives(&springs[groups[0] + 1..], &groups[1..], cache)
             }
         }
     }
