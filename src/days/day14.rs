@@ -1,10 +1,7 @@
 extern crate itertools;
 extern crate num;
 
-use std::{
-    collections::{HashMap, HashSet},
-    fmt, iter,
-};
+use std::{collections::HashMap, fmt};
 
 use itertools::Itertools;
 
@@ -87,7 +84,7 @@ impl Platform {
     fn from(input: &[String]) -> Platform {
         let mut board = Vec::new();
         for (i, row) in input.iter().enumerate() {
-            for (j, c) in row.chars().enumerate() {
+            for c in row.chars() {
                 if i >= board.len() {
                     board.push(Vec::new());
                 }
