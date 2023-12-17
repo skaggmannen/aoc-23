@@ -104,6 +104,11 @@ fn main() {
                 "part2" => days::day16::part2(&input).unwrap(),
                 _ => format!("Invalid part {}", args.part),
             },
+            "day17" => match args.part.as_str() {
+                "part1" => days::day17::part1(&input).unwrap(),
+                "part2" => days::day17::part2(&input).unwrap(),
+                _ => format!("Invalid part {}", args.part),
+            },
             _ => format!("Invalid day {}", args.day),
         }
     )
