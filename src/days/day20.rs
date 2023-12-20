@@ -1,7 +1,4 @@
-use std::{
-    collections::{HashMap, VecDeque},
-    fmt::format,
-};
+use std::collections::{HashMap, VecDeque};
 
 use itertools::Itertools;
 
@@ -344,8 +341,8 @@ impl Module for Conjunction {
     fn send_pulse(&mut self, from: &str, pulse: &Pulse) -> Vec<PulseRequest> {
         let mut requests = Vec::new();
 
-        // When a pulse is received, the conjunction module first
-        // updates its memory for that input.
+        // When a pulse is received, the conjunction module first updates its
+        // memory for that input.
         self.memory.insert(from.to_owned(), *pulse);
 
         if self.memory.values().all(|&p| p == Pulse::High) {
@@ -436,7 +433,7 @@ impl Module for Rx {
         self.inputs.clone()
     }
 
-    fn send_pulse(&mut self, _from: &str, pulse: &Pulse) -> Vec<PulseRequest> {
+    fn send_pulse(&mut self, _from: &str, _pulse: &Pulse) -> Vec<PulseRequest> {
         Vec::new()
     }
 }
