@@ -11,14 +11,14 @@ extern crate itertools;
 extern crate num;
 
 pub fn part1(input: &str) -> Result<String> {
+    // Create a lookup table for all the modules in the network.
     let mut modules: HashMap<String, Box<dyn Module>> = util::non_empty_lines(input)
         .map(|s| parse_module(&s))
         .map_ok(|m| (m.id(), m))
         .collect::<Result<HashMap<_, _>>>()?;
 
+    // Make sure all modules know about their inputs.
     let keys = modules.keys().map(|s| s.to_owned()).collect_vec();
-
-    // Make sure all Conjunction modules know about their inputs.
     for id in keys.iter() {
         let m = modules.get(id).unwrap();
 
@@ -64,8 +64,12 @@ pub fn part1(input: &str) -> Result<String> {
                     Pulse::Low => low_count += 1,
                 }
 
+                // Find the destination module and send the pulse to it.
                 if let Some(dst) = modules.get_mut(&req.to) {
                     let out = dst.send_pulse(&req.from, &req.pulse);
+
+                    // This will likely cause the module to send out new pulses
+                    // so add them to the processing queue.
                     if !out.is_empty() {
                         fifo.push_back(out);
                     }
@@ -83,18 +87,19 @@ fn test_part1() {
 }
 
 pub fn part2(input: &str) -> Result<String> {
+    // Build a lookup map for all modules in the network.
     let mut modules: HashMap<String, Box<dyn Module>> = util::non_empty_lines(input)
         .map(|s| parse_module(&s))
         .map_ok(|m| (m.id(), m))
         .collect::<Result<HashMap<_, _>>>()?;
 
-    let keys = modules.keys().map(|s| s.to_owned()).collect_vec();
     let mut rx = Rx {
         id: "rx".to_string(),
         inputs: Vec::new(),
     };
 
-    // Make sure all Conjunction modules know about their inputs.
+    // Make sure all modules know about their inputs.
+    let keys = modules.keys().map(|s| s.to_owned()).collect_vec();
     for id in keys.iter() {
         let m = modules.get(id).unwrap();
 
@@ -109,11 +114,16 @@ pub fn part2(input: &str) -> Result<String> {
         }
     }
 
-    // The rx has a single feeder module. We are interested in the behavior of
-    // it's inputs. They will each have a certain number of button presses
-    // before giving a high input, and the total number of button presses needed
+    // The rx has a single feeder module. We are interested in finding out when
+    // all of those inputs are high at the same time.
+    //
+    // Each input will require a certain number of button presses
+    // before giving a high output, and the total number of button presses
     // can be calculated by finding the LCM of those cycles.
     let rx_feeder = rx.inputs.first().unwrap();
+
+    // Find the inputs of the rx feeder module and initialize the cycle
+    // counters for them to zero.
     let mut rx_feeder_inputs: HashMap<String, u64> = modules
         .get(rx_feeder)
         .unwrap()
@@ -147,17 +157,11 @@ pub fn part2(input: &str) -> Result<String> {
             let reqs = fifo.pop_front().unwrap();
 
             for req in reqs {
-                if let Some(dst) = modules.get_mut(&req.to) {
-                    let out = dst.send_pulse(&req.from, &req.pulse);
-                    if !out.is_empty() {
-                        fifo.push_back(out);
-                    }
-                }
-
+                // Check if this was a pulse from one of the rx feeder modules.
                 if let Some(&v) = rx_feeder_inputs.get(&req.from) {
+                    // If the output was high we should store the value (but
+                    // only the first time).
                     if v == 0 && req.pulse == Pulse::High {
-                        // One of the inputs gave a high output. Remember the
-                        // number of button presses required for this to happen.
                         rx_feeder_inputs.insert(req.to.clone(), i);
                     }
                 }
@@ -167,10 +171,19 @@ pub fn part2(input: &str) -> Result<String> {
                     // stop pressing the button.
                     break 'press_button;
                 }
+
+                // Find the destination and send the pulse to it.
+                if let Some(dst) = modules.get_mut(&req.to) {
+                    let out = dst.send_pulse(&req.from, &req.pulse);
+                    if !out.is_empty() {
+                        fifo.push_back(out);
+                    }
+                }
             }
         }
     }
 
+    // Calculate the LCM of all the feeder input cycles.
     let count = rx_feeder_inputs
         .values()
         .fold(1, |acc, &v| num::integer::lcm(acc, v));
