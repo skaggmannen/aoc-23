@@ -23,8 +23,10 @@ pub fn part2(_input: &str) -> Result<String> {
     // I actually did not manage to solve this in Rust, so I used Wolfram Alpha
     // to solve the system of equations below for a few hailstones:
     //
-    //     (r_x - h_x) * (h_vy - r_vy) - (r_y - h_y) * (h_vx - r_vx) = 0
-    //     (r_y - h_y) * (h_vz - r_vz) - (r_z - h_z) * (h_vy - r_vy) = 0
+    // Position = (x, y, z), Velocity = (a, b, c)
+    //
+    //     (x - x_hs) * (b_hs - b) - (y - y_hs) * (a_hs - a) = 0
+    //     (y - y_hs) * (c_hs - c) - (z - z_hs) * (b_hs - b) = 0
     //
     // r_pos = (420851642592931, 273305746686315, 176221626745613)
     // r_vel = (-261, 15, 233)
